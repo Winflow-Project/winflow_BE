@@ -6,7 +6,7 @@ import cors from 'cors';
 import DotenvConfig from '@config/dotenv.config';
 import { connectDB } from '@config/db';
 import { errorHandler, routeNotFound } from '@middlewares/error.middleware';
-
+import indexRouter from '@routes/index';
 const corsOptions = {
   //   origin: Config.Cors.origin,
   optionsSuccessStatus: 200,
@@ -73,7 +73,7 @@ export default class Server {
         message: 'Server initialized and ready for action!',
       });
     });
-    // this.app.use("/v1/api", indexRouter(this.io));
+    this.app.use('/v1/api', indexRouter);
   }
 
   initializeSocket() {

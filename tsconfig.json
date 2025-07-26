@@ -12,7 +12,8 @@
       "@services/*": ["src/services/*"],
       "@user/*": ["src/v1/feat/user/*"],
       "@auth/*": ["src/v1/feat/auth/*"],
-      "@validations/*": ["src/validations/*"]
+      "@validations/*": ["src/validations/*"],
+      "@routes/*": ["src/v1/routes/*"]
     },
     "outDir": "./dist",
     "rootDir": "./src",

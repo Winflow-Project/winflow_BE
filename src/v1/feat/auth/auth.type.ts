@@ -7,13 +7,11 @@ export interface ISignin {
 }
 
 export interface ISignup {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
   email: string;
+  password: string;
 }
 
-export interface IVerifyOTP {
+export interface IVerifyEmail {
   email: string;
   otp: string;
 }

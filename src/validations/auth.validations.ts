@@ -34,15 +34,13 @@ export const userPasswordSchema = Joi.string()
   });
 
 export const signupValidationSchema = Joi.object({
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  dateOfBirth: Joi.string().isoDate().required(),
   email: Joi.string().email().lowercase().required(),
+  password: userPasswordSchema,
 });
 
 export const verifyOTPValidationSchema = Joi.object({
   email: Joi.string().email().required(),
-  otp: Joi.string().required().length(6),
+  otp: Joi.string().required().length(4),
 });
 
 export const resendOTPValidationSchema = Joi.object({

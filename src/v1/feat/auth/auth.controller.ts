@@ -19,6 +19,21 @@ export default class AuthController {
     }
   }
 
+  static async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const payload = req.body;
+
+      await AuthService.verifyEmail(payload);
+
+      res.status(200).json({
+        success: true,
+        message: 'Email verified successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async signin(req: Request, res: Response, next: NextFunction) {
     try {
       let { email, password, rememberMe, deviceToken, deviceType } = req.body;
