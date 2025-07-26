@@ -8,11 +8,18 @@ import {
   Unauthorized,
   TooManyRequests,
 } from '@middlewares/error.middleware';
-import { ISignup, TokenType, TokenPayload, ISignin } from './auth.type';
+import {
+  ISignup,
+  TokenType,
+  TokenPayload,
+  ISignin,
+  IVerifyEmail,
+} from './auth.type';
 import { UserModel, IUserDocument } from '@user/user.model';
 import { LoginAttempt, TokenModel } from './auth.model';
 import { generateRandomHexString } from '@utils/crypto.utils';
 import { generateOTP, verifyOTP } from '@utils/otp.utils';
+import sendEmail from '@services/email/email.service';
 
 import {
   signinValidationSchema,
@@ -46,7 +53,52 @@ export default class AuthService {
 
     const userId = newUser._id?.toHexString()!;
 
+    await TokenModel.create({
+      userId: userId,
+      token: hashedOTP,
+      tokenType: TokenType.EMAIL_VERIFICATION,
+    });
+
+    await sendEmail({
+      to: payload.email,
+      subject: 'Email Verification',
+      templateName: 'email.verification',
+      placeholders: {
+        otp: otp,
+        verification_page_url: `${DotenvConfig.frontendBaseURL}/verifyemail?id=${userId}&token=${otp}`,
+      },
+    });
+
     return newUser;
+  }
+
+  static async verifyEmail(payload: IVerifyEmail): Promise<void> {
+    const { error } = verifyOTPValidationSchema.validate(payload);
+    if (error) {
+      const errorMessages: string[] = error.details.map(
+        (detail) => detail.message
+      );
+      throw new InvalidInput(errorMessages.join(', '));
+    }
+
+    const user = await UserModel.findOne({ email: payload.email });
+    if (!user) throw new ResourceNotFound('User not found');
+
+    if (user.isVerified) throw new BadRequest('Email already verified');
+
+    const existingToken = await TokenModel.findOne({
+      userId: user._id,
+      tokenType: TokenType.EMAIL_VERIFICATION,
+    });
+    if (!existingToken) throw new ResourceNotFound('OTP not found');
+
+    const isTokenValid = verifyOTP(payload.otp, existingToken.token);
+    if (!isTokenValid) throw new Unauthorized('Invalid or expired otp');
+
+    user.isVerified = true;
+    await user.save();
+
+    await TokenModel.findByIdAndDelete(existingToken._id);
   }
 
   static async signin(
@@ -69,6 +121,8 @@ export default class AuthService {
       await this.logFailedAttempt(payload.email, ipAddress);
       throw new Unauthorized("Account doesn't exist");
     }
+
+    this.checkLoginCooldown(existingUser, ipAddress);
 
     const isPasswordValid = await existingUser.comparePassword(
       payload.password

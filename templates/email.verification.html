@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email Address</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!--[if mso]>
+      <noscript>
+        <xml>
+          <o:OfficeDocumentSettings>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+          </o:OfficeDocumentSettings>
+        </xml>
+      </noscript>
+    <![endif]-->
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+      font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    "
+  >
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      width="100%"
+      style="background-color: #f0f0f0"
+    >
+      <tr>
+        <td align="center" style="padding: 20px">
+          <!-- Main Container -->
+          <table
+            role="presentation"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            width="600"
+            style="
+              max-width: 600px;
+              background-color: white;
+              border-radius: 8px;
+              overflow: hidden;
+            "
+          >
+            <!-- Header Section -->
+            <tr>
+              <td style="padding: 20px 20px 0 20px; background-color: white">
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                >
+                  <tr>
+                    <td style="padding-top: 15px">
+                      <h1
+                        style="
+                          margin: 0;
+                          font-size: 24px;
+                          font-weight: 600;
+                          color: #333;
+                          line-height: 1.2;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Verify Your Email Address
+                      </h1>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Content Section -->
+            <tr>
+              <td style="padding: 20px; background-color: white">
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                >
+                  <!-- Spacer -->
+                  <tr>
+                    <td style="height: 20px; line-height: 20px">&nbsp;</td>
+                  </tr>
+
+                  <!-- Main Message -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 16px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Thank you for creating an account with Winflow! To
+                        complete your account creation, please verify your email
+                        address by using the otp below
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- OTP Code Display -->
+                  <tr>
+                    <td style="text-align: center; padding: 20px 0">
+                      <div
+                        style="
+                          display: inline-block;
+                          background-color: #f8f9fa;
+                          border: 2px dashed #1da26f;
+                          border-radius: 8px;
+                          padding: 20px 30px;
+                          margin: 10px 0;
+                        "
+                      >
+                        <span
+                          style="
+                            font-size: 32px;
+                            font-weight: 700;
+                            color: #1da26f;
+                            letter-spacing: 8px;
+                            font-family: 'Courier New', monospace;
+                          "
+                        >
+                          {{otp}}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Instructions -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 16px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Enter this code in the verification field to activate
+                        your Winflow account. This code will expire in
+                        <strong>10 minutes</strong> for security purposes.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Call to Action Text -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 20px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        If you need to return to the verification page, click
+                        the button below:
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- CTA Button -->
+                  <tr>
+                    <td style="padding-bottom: 20px">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                      >
+                        <tr>
+                          <td
+                            style="
+                              background-color: #1da26f;
+                              border-radius: 6px;
+                            "
+                          >
+                            <a
+                              href="{{verification_page_url}}"
+                              style="
+                                display: inline-block;
+                                padding: 10px 20px;
+                                font-size: 14px;
+                                font-weight: 500;
+                                color: white;
+                                text-decoration: none;
+                                font-family:
+                                  -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                                  Roboto, Arial, sans-serif;
+                              "
+                            >
+                              Go to Verification Page
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Security Notice -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 16px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        <strong>Security Notice:</strong> If you didn't request
+                        this verification code, please ignore this email and
+                        ensure your account is secure.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Support Contact -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 16px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Need help? Contact our support team at
+                        <a
+                          href="mailto:stakeholderconnect.claymore@gmail.com"
+                          style="color: #3b82f6; text-decoration: underline"
+                        >
+                          winflow.team@gmail.com </a
+                        >.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Closing -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 16px 0;
+                          font-size: 14px;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Thank you for choosing Winflow!
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Signature -->
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 20px 0;
+                          font-size: 14px;
+                          font-weight: 600;
+                          color: #4b5563;
+                          line-height: 1.5;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                            Roboto, Arial, sans-serif;
+                        "
+                      >
+                        Best regards,<br />
+                        The Winflow Team
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Divider -->
+                  <tr>
+                    <td>
+                      <hr
+                        style="
+                          border: none;
+                          border-top: 1px solid #e0e0e0;
+                          margin: 0;
+                        "
+                      />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
