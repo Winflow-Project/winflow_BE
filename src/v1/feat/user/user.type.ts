@@ -9,9 +9,11 @@ export interface IUser {
     dialCode: string;
     number: number;
   };
+  gender?: string;
   appRole: AppRoles;
   isVerified: boolean;
   reAuth?: boolean;
+  interests?: string[];
   deletedAt?: Date;
   isAccountActive: boolean;
   lastLoginDate: Date;

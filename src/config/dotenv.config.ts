@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const DotenvConfig = {
@@ -44,7 +44,7 @@ const DotenvConfig = {
     origin: process.env.CORS_ORIGIN as string,
     methods: process.env.CORS_METHODS as string,
     allowedHeaders: process.env.CORS_ALLOWED_HEADERS as string,
-    credentials: process.env.CORS_CREDENTIALS === "true",
+    credentials: process.env.CORS_CREDENTIALS === 'true',
   },
   serverBaseURL: process.env.SERVER_BASE_URL as string,
   frontendBaseURL: process.env.FRONTEND_BASE_URL as string,

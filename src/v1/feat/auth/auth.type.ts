@@ -16,6 +16,12 @@ export interface IVerifyEmail {
   otp: string;
 }
 
+export interface IPersonaliseAccount {
+  email: string;
+  gender: string;
+  interests?: string[];
+}
+
 export interface ISetPassword {
   email: string;
   password: string;
