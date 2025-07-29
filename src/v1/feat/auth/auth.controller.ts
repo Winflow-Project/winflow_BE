@@ -64,4 +64,78 @@ export default class AuthController {
       next(error);
     }
   }
+
+  static async personaliseAccount(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      let { email, gender, interests } = req.body;
+
+      const { accessToken, refreshToken, user } =
+        await AuthService.personaliseAccount({ email, gender, interests });
+
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('at', accessToken);
+      res.setHeader('rt', refreshToken);
+
+      res.status(200).json({
+        success: true,
+        message: 'Account personalised successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+
+      await AuthService.forgotPassword(email);
+
+      // Response is sent before the email is sent to avoid timing attacks
+      res.status(200).json({
+        success: true,
+        message:
+          'If that email address is in our database, we will send you an email to reset your password.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      let { token, id, password } = req.body;
+
+      await AuthService.resetPassword(token, id, password);
+      res
+        .status(200)
+        .json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // static async resendResetPasswordEmail(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) {
+  //   try {
+  //     const { email } = req.body;
+
+  //     await AuthService.resendResetPasswordEmail(email);
+
+  //     res.status(200).json({
+  //       success: true,
+  //       message:
+  //         'If that email address is in our database, we will send you an email to reset your password.',
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }

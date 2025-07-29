@@ -54,3 +54,9 @@ export const signinValidationSchema = Joi.object({
   deviceType: Joi.string().allow(null, ''),
   rememberMe: Joi.boolean().required(),
 });
+
+export const personaliseAccountValidationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  gender: Joi.string().allow(null),
+  interests: Joi.array().items(Joi.string()),
+});
