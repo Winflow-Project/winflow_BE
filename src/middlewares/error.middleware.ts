@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express';
 export class HttpError extends Error {
   public status: number;
   public details: Record<string, any>;
@@ -14,8 +14,8 @@ export class HttpError extends Error {
     this.name = this.constructor.name;
     this.status = statusCode;
     this.details = details;
-    this.code = (details as { code?: number })["code"] || 0;
-    this.keyValue = (details as { keyValue?: object })["keyValue"] || {};
+    this.code = (details as { code?: number })['code'] || 0;
+    this.keyValue = (details as { keyValue?: object })['keyValue'] || {};
   }
 }
 
@@ -94,24 +94,24 @@ export const errorHandler = (
   let statusCode = err.status || 500;
   let cleanedMessage = (
     statusCode === 500
-      ? "An error occured, please try again later"
+      ? 'An error occured, please try again later'
       : err.message
-  ).replace(/"/g, "");
+  ).replace(/"/g, '');
 
-  console.log("err:", err);
+  console.log('err:', err);
   const responsePayload: any = {
     success: false,
     message: cleanedMessage,
   };
 
   if (err instanceof Error) {
-    if (err.name === "ValidationError") {
-      cleanedMessage = "Validation failed";
+    if (err.name === 'ValidationError') {
+      cleanedMessage = 'Validation failed';
       responsePayload.message = err.message;
       statusCode = 422;
     } else if (err.code && err.code == 11000) {
       const field = Object.keys(err.keyValue);
-      cleanedMessage = "Duplicate key error";
+      cleanedMessage = 'Duplicate key error';
       responsePayload.message = `An account with that ${field} already exists.`;
       statusCode = 409;
     }

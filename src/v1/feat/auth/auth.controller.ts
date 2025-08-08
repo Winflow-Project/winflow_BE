@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import AuthService from './auth.service';
 import { InvalidInput, Unauthorized } from '@middlewares/error.middleware';
-
+import passport from '@config/passport.config';
+import DotenvConfig from '@config/dotenv.config';
 export default class AuthController {
   static async signup(req: Request, res: Response, next: NextFunction) {
     try {
@@ -138,4 +139,63 @@ export default class AuthController {
   //     next(error);
   //   }
   // }
+
+  static googleAuth = passport.authenticate('google', {
+    scope: ['profile', 'email'],
+  });
+
+  static async googleCallback(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('google', { session: false }, async (err, user) => {
+      try {
+        if (err) {
+          console.error('Google authentication error:', err);
+          return res.redirect(
+            `${DotenvConfig.frontendBaseURL}/auth/error?message=${encodeURIComponent(err.message)}`
+          );
+        }
+
+        if (!user) {
+          return res.redirect(
+            `${DotenvConfig.frontendBaseURL}/auth/error?message=Authentication failed`
+          );
+        }
+
+        const {
+          accessToken,
+          refreshToken,
+          user: userData,
+          isNewUser,
+        } = await AuthService.handleGoogleCallback(user);
+
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('at', accessToken);
+        res.setHeader('rt', refreshToken);
+
+        const redirectUrl = isNewUser
+          ? `${DotenvConfig.frontendBaseURL}/onboarding?token=${accessToken}`
+          : `${DotenvConfig.frontendBaseURL}/dashboard?token=${accessToken}`;
+
+        res.redirect(redirectUrl);
+      } catch (error) {
+        console.error('Google callback error:', error);
+        next(error);
+      }
+    })(req, res, next);
+  }
+
+  static async linkGoogle(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.authUser!;
+      const { googleId } = req.body;
+
+      await AuthService.linkGoogleAccount(userId._id, googleId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Google account linked successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

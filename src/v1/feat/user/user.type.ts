@@ -1,15 +1,19 @@
+import { AuthProvider } from '@auth/auth.type';
 import { Document, Types } from 'mongoose';
 
 export interface IUser {
+  googleId?: string;
   firstName: string;
   lastName: string;
-  password: string;
+  password?: string;
   email: string;
   phone: {
     dialCode: string;
     number: number;
   };
+  profileImg?: string;
   gender?: string;
+  authProvider: AuthProvider;
   appRole: AppRoles;
   isVerified: boolean;
   reAuth?: boolean;

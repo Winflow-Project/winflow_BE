@@ -158,6 +158,11 @@ export default class AuthService {
       throw new Unauthorized("Account doesn't exist");
     }
 
+    if (!existingUser.password)
+      throw new Unauthorized(
+        'Account was created via Google. Use Google Sign-in.'
+      );
+
     this.checkLoginCooldown(existingUser, ipAddress);
 
     const isPasswordValid = await existingUser.comparePassword(
@@ -273,6 +278,47 @@ export default class AuthService {
     await user.save();
 
     await TokenModel.findByIdAndDelete(tokenId);
+  }
+
+  static async handleGoogleCallback(user: IUserDocument): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: IUserDocument;
+    isNewUser: boolean;
+  }> {
+    const isNewUser = !user.gender || !user.interests?.length;
+
+    const { accessToken, refreshToken } =
+      await AuthService['generateTokens'](user);
+
+    user.lastLoginDate = new Date();
+    if (user.reAuth) user.reAuth = false;
+    await user.save();
+
+    return {
+      accessToken,
+      refreshToken,
+      user,
+      isNewUser,
+    };
+  }
+
+  static async linkGoogleAccount(
+    userId: IUserDocument['_id'],
+    googleId: string
+  ): Promise<void> {
+    const user = await UserModel.findById(userId);
+    if (!user) throw new ResourceNotFound('User not found');
+
+    // Check if Google ID is already linked to another account
+    const existingGoogleUser = await UserModel.findOne({ googleId });
+    if (existingGoogleUser && existingGoogleUser.id !== userId)
+      throw new BadRequest(
+        'This Google account is already linked to another user'
+      );
+
+    user.googleId = googleId;
+    await user.save();
   }
 
   private static async logFailedAttempt(email: string, ipAddress: string) {

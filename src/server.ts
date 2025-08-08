@@ -7,6 +7,8 @@ import DotenvConfig from '@config/dotenv.config';
 import { connectDB } from '@config/db';
 import { errorHandler, routeNotFound } from '@middlewares/error.middleware';
 import indexRouter from '@routes/index';
+import passport from '@config/passport.config';
+
 const corsOptions = {
   //   origin: Config.Cors.origin,
   optionsSuccessStatus: 200,
@@ -58,6 +60,8 @@ export default class Server {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(express.json());
     this.app.use(cors(corsOptions));
+    this.app.use(passport.initialize());
+    // this.app.use(passport.session());
     // this.app.options(cors(corsOptions));
   }
 
