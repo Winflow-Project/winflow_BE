@@ -27,4 +27,11 @@ authRouter.post(
   AuthController.resetPassword.bind(AuthController)
 );
 
+authRouter.get('/google', AuthController.googleAuth.bind(AuthController));
+
+authRouter.get(
+  '/google/callback',
+  AuthController.googleCallback.bind(AuthController)
+);
+
 export default authRouter;
