@@ -7,15 +7,19 @@ export interface ISignin {
 }
 
 export interface ISignup {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
   email: string;
+  password: string;
 }
 
-export interface IVerifyOTP {
+export interface IVerifyEmail {
   email: string;
   otp: string;
+}
+
+export interface IPersonaliseAccount {
+  email: string;
+  gender: string;
+  interests?: string[];
 }
 
 export interface ISetPassword {
@@ -53,4 +57,23 @@ export interface ILoginAttempt extends Document {
   success: boolean;
   timestamp: Date;
   ipAddress: string;
+}
+
+export interface GoogleProfile {
+  id: string;
+  emails: { value: string; verified: boolean }[];
+  name: { givenName: string; familyName: string };
+  photos: { value: string }[];
+}
+
+export enum AuthProvider {
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+  GITHUB = 'github',
+  LOCAL = 'local',
+  TWITTER = 'twitter',
+  LINKEDIN = 'linkedin',
+  MICROSOFT = 'microsoft',
+  APPLE = 'apple',
+  OTHER = 'other',
 }

@@ -8,17 +8,28 @@ import {
   Unauthorized,
   TooManyRequests,
 } from '@middlewares/error.middleware';
-import { ISignup, TokenType, TokenPayload, ISignin } from './auth.type';
+import {
+  ISignup,
+  TokenType,
+  TokenPayload,
+  ISignin,
+  IVerifyEmail,
+  IPersonaliseAccount,
+} from './auth.type';
 import { UserModel, IUserDocument } from '@user/user.model';
 import { LoginAttempt, TokenModel } from './auth.model';
 import { generateRandomHexString } from '@utils/crypto.utils';
 import { generateOTP, verifyOTP } from '@utils/otp.utils';
+import sendEmail from '@services/email/email.service';
 
 import {
+  personaliseAccountValidationSchema,
   signinValidationSchema,
   signupValidationSchema,
+  userPasswordSchema,
   verifyOTPValidationSchema,
 } from '@validations/auth.validations';
+import { isValidObjectId } from 'mongoose';
 
 export default class AuthService {
   private static JWT_OPTIONS: SignOptions = {
@@ -46,7 +57,84 @@ export default class AuthService {
 
     const userId = newUser._id?.toHexString()!;
 
+    await TokenModel.create({
+      userId: userId,
+      token: hashedOTP,
+      tokenType: TokenType.EMAIL_VERIFICATION,
+    });
+
+    await sendEmail({
+      to: payload.email,
+      subject: 'Email Verification',
+      templateName: 'email.verification',
+      placeholders: {
+        otp: otp,
+        verification_page_url: `${DotenvConfig.frontendBaseURL}/verifyemail?id=${userId}&token=${otp}`,
+      },
+    });
+
     return newUser;
+  }
+
+  static async verifyEmail(payload: IVerifyEmail): Promise<void> {
+    const { error } = verifyOTPValidationSchema.validate(payload);
+    if (error) {
+      const errorMessages: string[] = error.details.map(
+        (detail) => detail.message
+      );
+      throw new InvalidInput(errorMessages.join(', '));
+    }
+
+    const user = await UserModel.findOne({ email: payload.email });
+    if (!user) throw new ResourceNotFound('User not found');
+
+    if (user.isVerified) throw new BadRequest('Email already verified');
+
+    const existingToken = await TokenModel.findOne({
+      userId: user._id,
+      tokenType: TokenType.EMAIL_VERIFICATION,
+    });
+    if (!existingToken) throw new ResourceNotFound('OTP not found');
+
+    const isTokenValid = verifyOTP(payload.otp, existingToken.token);
+    if (!isTokenValid) throw new Unauthorized('Invalid or expired otp');
+
+    user.isVerified = true;
+    await user.save();
+
+    await TokenModel.findByIdAndDelete(existingToken._id);
+  }
+
+  static async personaliseAccount(payload: IPersonaliseAccount): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: IUserDocument;
+  }> {
+    const { error } = personaliseAccountValidationSchema.validate(payload);
+    if (error) {
+      const errorMessages: string[] = error.details.map(
+        (detail) => detail.message
+      );
+      throw new InvalidInput(errorMessages.join(', '));
+    }
+
+    const existingUser = await UserModel.findOne({ email: payload.email });
+    if (!existingUser) throw new ResourceNotFound('User not found');
+
+    if (!existingUser.isVerified)
+      throw new Unauthorized('Email not verified. Please verify your email.');
+
+    if (!existingUser.isAccountActive)
+      throw new Unauthorized('Account is deactivated. Please contact support.');
+
+    existingUser.gender = payload.gender;
+    existingUser.interests = payload.interests || [];
+    await existingUser.save();
+
+    const { accessToken, refreshToken } =
+      await this.generateTokens(existingUser);
+
+    return { accessToken, refreshToken, user: existingUser };
   }
 
   static async signin(
@@ -69,6 +157,13 @@ export default class AuthService {
       await this.logFailedAttempt(payload.email, ipAddress);
       throw new Unauthorized("Account doesn't exist");
     }
+
+    if (!existingUser.password)
+      throw new Unauthorized(
+        'Account was created via Google. Use Google Sign-in.'
+      );
+
+    this.checkLoginCooldown(existingUser, ipAddress);
 
     const isPasswordValid = await existingUser.comparePassword(
       payload.password
@@ -95,6 +190,135 @@ export default class AuthService {
     });
 
     return { accessToken, refreshToken, user: existingUser };
+  }
+
+  static async forgotPassword(email: string) {
+    const existingUser = await UserModel.findOne({ email });
+    if (!existingUser)
+      throw new ResourceNotFound('No account found with the provided email');
+
+    if (!existingUser.isVerified)
+      throw new Unauthorized(
+        'Email not verified. Please verify your email before resetting password.'
+      );
+
+    if (!existingUser.isAccountActive)
+      throw new Unauthorized('Account is deactivated. Please contact support.');
+
+    const existingToken = await TokenModel.findOne({
+      userId: existingUser.id,
+    });
+    if (existingToken) await TokenModel.findByIdAndDelete(existingToken._id);
+
+    const resetToken = generateRandomHexString(32);
+    const hashedToken = await bcrypt.hash(resetToken, DotenvConfig.BcryptSalt);
+
+    const token = await TokenModel.create({
+      userId: existingUser._id,
+      token: hashedToken,
+      tokenType: TokenType.RESET_PASSWORD,
+    });
+
+    const resetURL = `${DotenvConfig.frontendBaseURL}/resetpassword?id=${token._id}&token=${resetToken}`;
+
+    await sendEmail({
+      to: email,
+      subject: 'Password Reset',
+      templateName: 'forgot.password',
+      placeholders: {
+        name: existingUser.firstName,
+        email: existingUser.email,
+        reset_link: resetURL,
+      },
+    });
+  }
+
+  static async resetPassword(
+    token: string,
+    tokenId: string,
+    password: string
+  ): Promise<void> {
+    if (!(token && password && tokenId)) {
+      throw new BadRequest('token, id and password are required');
+    }
+
+    if (!isValidObjectId(tokenId)) {
+      throw new BadRequest('Invalid token Id');
+    }
+
+    const existingToken = await TokenModel.findById(tokenId);
+    if (!existingToken) {
+      throw new Unauthorized('Reset token not found or expired');
+    }
+
+    const tokenMatch = await bcrypt.compare(token, existingToken.token);
+    if (!tokenMatch) {
+      throw new Unauthorized('Invalid or expired token');
+    }
+
+    const { error: passwordError } = userPasswordSchema.validate(password);
+    if (passwordError) {
+      throw new InvalidInput('Invalid input', {
+        message: passwordError.message,
+      });
+    }
+
+    const user = await UserModel.findById(existingToken.userId);
+    if (!user) {
+      throw new ResourceNotFound(
+        'User associated with this token was not found'
+      );
+    }
+
+    if (!user.isVerified) throw new Unauthorized('Account is not verified');
+
+    if (!user.isAccountActive) throw new Unauthorized('Account is deactivated');
+
+    user.password = password;
+    await user.save();
+
+    await TokenModel.findByIdAndDelete(tokenId);
+  }
+
+  static async handleGoogleCallback(user: IUserDocument): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: IUserDocument;
+    isNewUser: boolean;
+  }> {
+    const isNewUser = !user.gender || !user.interests?.length;
+
+    const { accessToken, refreshToken } =
+      await AuthService['generateTokens'](user);
+
+    user.lastLoginDate = new Date();
+    if (user.reAuth) user.reAuth = false;
+    await user.save();
+
+    return {
+      accessToken,
+      refreshToken,
+      user,
+      isNewUser,
+    };
+  }
+
+  static async linkGoogleAccount(
+    userId: IUserDocument['_id'],
+    googleId: string
+  ): Promise<void> {
+    const user = await UserModel.findById(userId);
+    if (!user) throw new ResourceNotFound('User not found');
+
+    // Check if Google ID is already linked to another account
+    const existingGoogleUser = await UserModel.findOne({ googleId });
+    if (existingGoogleUser && existingGoogleUser.id !== userId)
+      throw new BadRequest(
+        'This Google account is already linked to another user'
+      );
+
+    user.googleId = googleId;
+    await user.save();
   }
 
   private static async logFailedAttempt(email: string, ipAddress: string) {

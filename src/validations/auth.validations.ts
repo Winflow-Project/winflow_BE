@@ -34,15 +34,13 @@ export const userPasswordSchema = Joi.string()
   });
 
 export const signupValidationSchema = Joi.object({
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  dateOfBirth: Joi.string().isoDate().required(),
   email: Joi.string().email().lowercase().required(),
+  password: userPasswordSchema,
 });
 
 export const verifyOTPValidationSchema = Joi.object({
   email: Joi.string().email().required(),
-  otp: Joi.string().required().length(6),
+  otp: Joi.string().required().length(4),
 });
 
 export const resendOTPValidationSchema = Joi.object({
@@ -55,4 +53,10 @@ export const signinValidationSchema = Joi.object({
   deviceToken: Joi.string().allow(null, ''),
   deviceType: Joi.string().allow(null, ''),
   rememberMe: Joi.boolean().required(),
+});
+
+export const personaliseAccountValidationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  gender: Joi.string().allow(null),
+  interests: Joi.array().items(Joi.string()),
 });

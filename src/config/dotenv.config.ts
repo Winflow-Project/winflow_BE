@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const DotenvConfig = {
@@ -28,10 +28,10 @@ const DotenvConfig = {
     secure: process.env.MAIL_SECURE as unknown as boolean,
   },
   Google: {
-    clientID: process.env.GOOGLE_AUTH_CLIENT_ID as string,
-    clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET as string,
-    callbackUrl: process.env.GOOGLE_AUTH_CALLBACK_URL as string,
-    successUrl: process.env.GOOGLE_AUTH_SUCCESS_REDIRECT_URL as string,
+    clientID: process.env.GOOGLE_CLIENT_ID as string,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL as string,
+    successUrl: process.env.GOOGLE_SUCCESS_REDIRECT_URL as string,
     failureUrl: process.env.FAILURE_REDIRECT_URL as string,
   },
   Cloud: {
@@ -44,7 +44,7 @@ const DotenvConfig = {
     origin: process.env.CORS_ORIGIN as string,
     methods: process.env.CORS_METHODS as string,
     allowedHeaders: process.env.CORS_ALLOWED_HEADERS as string,
-    credentials: process.env.CORS_CREDENTIALS === "true",
+    credentials: process.env.CORS_CREDENTIALS === 'true',
   },
   serverBaseURL: process.env.SERVER_BASE_URL as string,
   frontendBaseURL: process.env.FRONTEND_BASE_URL as string,
