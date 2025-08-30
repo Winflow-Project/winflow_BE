@@ -10,8 +10,8 @@
     "serve": "npm run build && node -r tsconfig-paths/register dist/index.js",
     "build": "npm run clean && tsc && tsc-alias",
     "clean": "rm -rf dist && mkdir dist",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint './src/**/*.{ts,tsx}'",
+    "lint:fix": "eslint './src/**/*.{ts,tsx}' --fix",
     "format": "prettier --write ."
   },
   "repository": {
