@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import DotenvConfig from "./dotenv.config";
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import DotenvConfig from './dotenv.config';
 let mongoServer: MongoMemoryServer;
 
 export const connectDB = async (): Promise<void> => {
   if (mongoose.connection.readyState !== 0) {
-    console.log("Already connected to MongoDB. Disconnecting first...");
+    console.log('Already connected to MongoDB. Disconnecting first...');
     await mongoose.disconnect();
   }
   // Check if not connected
   try {
-    if (process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === 'test') {
       mongoServer = await MongoMemoryServer.create();
       const uri = mongoServer.getUri();
       await mongoose.connect(uri);
@@ -30,11 +30,11 @@ export const connectDB = async (): Promise<void> => {
 export const disconnectDB = async (): Promise<void> => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
-    console.log("Disconnected from MongoDB");
+    console.log('Disconnected from MongoDB');
   }
   if (mongoServer) {
     await mongoServer.stop();
-    console.log("Stopped in-memory MongoDB");
+    console.log('Stopped in-memory MongoDB');
   }
 };
 
@@ -45,6 +45,6 @@ export const clearDatabase = async (): Promise<void> => {
       const collection = collections[key];
       await collection.deleteMany({}); // Clear data from all collections
     }
-    console.log("Test database cleared");
+    console.log('Test database cleared');
   }
 };
