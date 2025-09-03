@@ -13,6 +13,7 @@
       "@services/*": ["src/services/*"],
       "@user/*": ["src/v1/feat/user/*"],
       "@auth/*": ["src/v1/feat/auth/*"],
+      "@thread/*": ["src/v1/feat/thread/*"],
       "@validations/*": ["src/validations/*"],
       "@routes/*": ["src/v1/routes/*"]
     },
