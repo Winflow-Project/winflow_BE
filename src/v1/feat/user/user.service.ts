@@ -11,4 +11,11 @@ export default class UserService {
     if (!updatedUser) throw new ResourceNotFound('User not found');
     return updatedUser;
   }
+
+  static async getUser(userId: IUserDocument) {
+    const user = await UserModel.findById(userId._id);
+    if (!user) throw new ResourceNotFound('User not found');
+
+    return user;
+  }
 }
