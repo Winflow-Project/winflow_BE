@@ -1,5 +1,5 @@
 import Joi from 'joi';
-
+import safeString from './safe.string.validations';
 export const userPasswordSchema = Joi.string()
   .min(8)
   .pattern(/[a-z]/, 'lowercase letter')
@@ -34,29 +34,29 @@ export const userPasswordSchema = Joi.string()
   });
 
 export const signupValidationSchema = Joi.object({
-  email: Joi.string().email().lowercase().required(),
+  email: safeString.label('Email').email().lowercase().required(),
   password: userPasswordSchema,
 });
 
 export const verifyOTPValidationSchema = Joi.object({
-  email: Joi.string().email().required(),
-  otp: Joi.string().required().length(4),
+  email: safeString.label('Email').email().required(),
+  otp: safeString.label('OTP').required().length(4),
 });
 
 export const resendOTPValidationSchema = Joi.object({
-  email: Joi.string().email().lowercase().required(),
+  email: safeString.label('Email').email().lowercase().required(),
 });
 
 export const signinValidationSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-  deviceToken: Joi.string().allow(null, ''),
-  deviceType: Joi.string().allow(null, ''),
+  email: safeString.label('Email').email().required(),
+  password: safeString.label('Password').min(8).required(),
+  deviceToken: safeString.label('Device Token').allow(null, ''),
+  deviceType: safeString.label('Device Type').allow(null, ''),
   rememberMe: Joi.boolean().required(),
 });
 
 export const personaliseAccountValidationSchema = Joi.object({
-  email: Joi.string().email().required(),
-  gender: Joi.string().allow(null),
-  interests: Joi.array().items(Joi.string()),
+  email: safeString.label('Email').email().required(),
+  gender: safeString.label('Gender').allow(null),
+  interests: Joi.array().items(safeString.label('Intere')),
 });
