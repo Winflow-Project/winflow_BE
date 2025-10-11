@@ -1,3 +1,4 @@
+import { IAccount } from '@account/account.types';
 import { AuthProvider } from '@auth/auth.type';
 import { Document, Types } from 'mongoose';
 
@@ -21,6 +22,7 @@ export interface IUser {
   porfolio?: string[];
   skills?: string[];
   socials?: string[];
+  account: IAccount;
   deletedAt?: Date;
   isAccountActive: boolean;
   lastLoginDate: Date;
