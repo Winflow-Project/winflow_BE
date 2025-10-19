@@ -18,6 +18,9 @@ export interface IUser {
   isVerified: boolean;
   reAuth?: boolean;
   interests?: string[];
+  porfolio?: string[];
+  skills?: string[];
+  socials?: string[];
   deletedAt?: Date;
   isAccountActive: boolean;
   lastLoginDate: Date;
