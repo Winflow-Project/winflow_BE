@@ -18,4 +18,9 @@ export default class UserService {
 
     return user;
   }
+
+  static async getAllUsers() {
+    const users = await UserModel.find();
+    return users;
+  }
 }
