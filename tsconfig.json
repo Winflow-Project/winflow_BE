@@ -14,6 +14,9 @@
       "@user/*": ["src/v1/feat/user/*"],
       "@auth/*": ["src/v1/feat/auth/*"],
       "@thread/*": ["src/v1/feat/thread/*"],
+      "@account/*": ["src/v1/feat/account/*"],
+      "@settings/*": ["src/v1/feat/account/settings/*"],
+      "@preferences/*": ["src/v1/feat/account/preferences/*"],
       "@validations/*": ["src/validations/*"],
       "@routes/*": ["src/v1/routes/*"]
     },
